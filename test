@@ -1,0 +1,76 @@
+ import java.sql.*;  
+      
+public class JDBCExample{  
+      
+    public static void main(java.lang.String[] args) 
+    {
+      
+        Connection con = null;  
+        ResultSetMetaData rsmd = null;
+      
+        try {  
+              Class.forName("com.ibm.as400.access.AS400JDBCDriver");  
+        } catch(ClassNotFoundException e) {  
+              System.out.println(e);  
+              System.exit(0);  
+        }  
+      
+        try{
+        	 con = DriverManager.getConnection("jdbc:as400://twboss02.tw.ibm.com", "qsecofr", "taipei101");
+             Statement stmt = con.createStatement();        
+             ResultSet rs = stmt.executeQuery("SELECT * FROM WOODY.EMPLOYEE"); 
+             //************************************************
+             rsmd = rs.getMetaData();
+
+             int colCount = rsmd.getColumnCount();
+             int rowCount = 0;
+         for (int i = 1; i <= colCount; i++) {
+                 System.out.println("Information about column " + i);
+                 System.out.println("   Name..........: " + rsmd.getColumnName(i));
+                 System.out.println("   Data Type.....: " + rsmd.getColumnType(i) + 
+                                    " ( " + rsmd.getColumnTypeName(i) + " )");
+                 System.out.println("   Precision.....: " + rsmd.getPrecision(i));
+                 System.out.println("   Scale.........: " + rsmd.getScale(i));
+                 System.out.print  ("   Allows Nulls..: ");
+                 if (rsmd.isNullable(i)==0) 
+                     System.out.println("false");
+                 else
+                     System.out.println("true");
+             }
+
+         //***********************************
+         while (rs.next ())
+         {
+             // Get the values from the ResultSet. The first value 
+             // is a string, and the second value is an integer.
+             String id = rs.getString("ID");
+             int salary = rs.getInt("SALARY");
+
+             System.out.print("ID = " + id);
+             System.out.println(", Salary = " + salary);
+
+          
+         }
+         
+         
+         } catch (Exception e) {
+             // Handle any errors.
+             System.out.println("Oops... we have an error... ");
+             e.printStackTrace();
+         } finally {
+             
+             if (con != null) {
+                 try {
+                     con.close();
+                 } catch (SQLException e) {
+                     System.out.println("Critical error - cannot close connection object");
+                 }
+             }
+         }
+             
+         //*********************************************
+      
+       
+       }
+     
+    }
